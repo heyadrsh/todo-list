@@ -4,6 +4,16 @@
     --secondary-background: #f5f5f5;
     --text-color: #333;
     --border-color: #ddd;
+    --hover-color: #eee;
+}
+
+[data-theme="dark"] {
+    --primary-color: #fff;
+    --background-color: #1a1a1a;
+    --secondary-background: #2d2d2d;
+    --text-color: #fff;
+    --border-color: #404040;
+    --hover-color: #333;
 }
 
 * {
@@ -17,6 +27,7 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .container {
@@ -30,6 +41,8 @@ header {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
 }
 
 h1 {
@@ -44,6 +57,11 @@ button {
     background-color: var(--secondary-background);
     color: var(--text-color);
     cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background-color: var(--hover-color);
 }
 
 .add-todo-section {
@@ -53,12 +71,72 @@ button {
     margin-bottom: 2rem;
     display: flex;
     gap: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 #todo-input {
     flex: 1;
-    padding: 0.5rem;
-    border: 1px solid var(--border-color);
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
     border-radius: 6px;
     font-size: 1rem;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: border-color 0.2s ease;
+}
+
+#todo-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.todo-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--secondary-background);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    transition: transform 0.2s;
+}
+
+.todo-item:hover {
+    transform: translateX(4px);
+}
+
+.todo-item input[type="checkbox"] {
+    margin-right: 1rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+}
+
+.todo-item span {
+    flex: 1;
+    font-size: 1.1rem;
+}
+
+.todo-item.completed span {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.delete-todo {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    padding: 0.25rem 0.5rem;
+}
+
+.todo-item:hover .delete-todo {
+    opacity: 1;
+}
+
+@media (max-width: 600px) {
+    .add-todo-section {
+        flex-direction: column;
+    }
+    
+    #todo-input {
+        width: 100%;
+    }
 } 
