@@ -5,6 +5,9 @@
     --text-color: #333;
     --border-color: #ddd;
     --hover-color: #eee;
+    --priority-high: #ff4d4d;
+    --priority-medium: #ffd700;
+    --priority-low: #4caf50;
 }
 
 [data-theme="dark"] {
@@ -69,13 +72,17 @@ button:hover {
     padding: 1.5rem;
     border-radius: 12px;
     margin-bottom: 2rem;
-    display: flex;
-    gap: 1rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.todo-details {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
 #todo-input {
-    flex: 1;
+    width: 100%;
     padding: 0.75rem;
     border: 2px solid var(--border-color);
     border-radius: 6px;
@@ -90,6 +97,20 @@ button:hover {
     border-color: var(--primary-color);
 }
 
+select {
+    padding: 0.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.filters {
+    margin-bottom: 2rem;
+}
+
 .todo-item {
     display: flex;
     align-items: center;
@@ -98,10 +119,23 @@ button:hover {
     border-radius: 8px;
     margin-bottom: 0.5rem;
     transition: transform 0.2s;
+    border-left: 4px solid transparent;
 }
 
 .todo-item:hover {
     transform: translateX(4px);
+}
+
+.todo-item.priority-high {
+    border-left-color: var(--priority-high);
+}
+
+.todo-item.priority-medium {
+    border-left-color: var(--priority-medium);
+}
+
+.todo-item.priority-low {
+    border-left-color: var(--priority-low);
 }
 
 .todo-item input[type="checkbox"] {
@@ -111,12 +145,23 @@ button:hover {
     cursor: pointer;
 }
 
-.todo-item span {
+.todo-content {
     flex: 1;
+    margin: 0 1rem;
+}
+
+.todo-text {
     font-size: 1.1rem;
 }
 
-.todo-item.completed span {
+.todo-meta {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-top: 0.25rem;
+}
+
+.todo-item.completed .todo-text {
     text-decoration: line-through;
     opacity: 0.7;
 }
@@ -132,11 +177,11 @@ button:hover {
 }
 
 @media (max-width: 600px) {
-    .add-todo-section {
+    .todo-details {
         flex-direction: column;
     }
     
-    #todo-input {
+    select, button {
         width: 100%;
     }
 } 

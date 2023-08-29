@@ -1,9 +1,10 @@
 // Todo Class
 class Todo {
-    constructor(id, text, completed = false) {
+    constructor(id, text, completed = false, priority = 'low') {
         this.id = id;
         this.text = text;
         this.completed = completed;
+        this.priority = priority;
         this.createdAt = new Date();
     }
 }
@@ -11,10 +12,11 @@ class Todo {
 // TodoApp Class
 class TodoApp {
     constructor() {
-        this.todos = [];
+        this.todos = this.loadTodos();
         this.initializeElements();
         this.setupEventListeners();
         this.loadTheme();
+        this.renderTodos();
     }
 
     initializeElements() {
@@ -22,6 +24,8 @@ class TodoApp {
         this.addButton = document.getElementById('add-todo');
         this.todosContainer = document.getElementById('todos-container');
         this.themeToggle = document.getElementById('theme-toggle');
+        this.prioritySelect = document.getElementById('priority');
+        this.filterPriority = document.getElementById('filter-priority');
     }
 
     setupEventListeners() {
@@ -30,6 +34,8 @@ class TodoApp {
             if (e.key === 'Enter') this.addTodo();
         });
         this.themeToggle.addEventListener('click', () => this.toggleTheme());
+        this.filterPriority.addEventListener('change', () => this.renderTodos());
+        
         this.todosContainer.addEventListener('click', (e) => {
             const todoItem = e.target.closest('.todo-item');
             if (!todoItem) return;
@@ -41,6 +47,23 @@ class TodoApp {
                 this.deleteTodo(todoItem.id.replace('todo-', ''));
             }
         });
+    }
+
+    loadTodos() {
+        const savedTodos = localStorage.getItem('todos');
+        if (savedTodos) {
+            const todos = JSON.parse(savedTodos);
+            return todos.map(todo => {
+                const newTodo = new Todo(todo.id, todo.text, todo.completed, todo.priority);
+                newTodo.createdAt = new Date(todo.createdAt);
+                return newTodo;
+            });
+        }
+        return [];
+    }
+
+    saveTodos() {
+        localStorage.setItem('todos', JSON.stringify(this.todos));
     }
 
     loadTheme() {
@@ -61,8 +84,15 @@ class TodoApp {
         const text = this.todoInput.value.trim();
         if (!text) return;
 
-        const todo = new Todo(Date.now(), text);
+        const todo = new Todo(
+            Date.now(),
+            text,
+            false,
+            this.prioritySelect.value
+        );
+
         this.todos.unshift(todo);
+        this.saveTodos();
         this.renderTodos();
         this.resetInputs();
     }
@@ -71,24 +101,43 @@ class TodoApp {
         const todo = this.todos.find(t => t.id === parseInt(id));
         if (todo) {
             todo.completed = !todo.completed;
+            this.saveTodos();
             this.renderTodos();
         }
     }
 
     deleteTodo(id) {
         this.todos = this.todos.filter(t => t.id !== parseInt(id));
+        this.saveTodos();
         this.renderTodos();
     }
 
+    filterTodos() {
+        let filtered = [...this.todos];
+        const priorityFilter = this.filterPriority.value;
+
+        if (priorityFilter !== 'all') {
+            filtered = filtered.filter(todo => todo.priority === priorityFilter);
+        }
+
+        return filtered;
+    }
+
     renderTodos() {
-        this.todosContainer.innerHTML = this.todos.map(todo => this.createTodoElement(todo)).join('');
+        const filtered = this.filterTodos();
+        this.todosContainer.innerHTML = filtered.map(todo => this.createTodoElement(todo)).join('');
     }
 
     createTodoElement(todo) {
         return `
-            <div class="todo-item ${todo.completed ? 'completed' : ''}" id="todo-${todo.id}">
+            <div class="todo-item priority-${todo.priority} ${todo.completed ? 'completed' : ''}" id="todo-${todo.id}">
                 <input type="checkbox" ${todo.completed ? 'checked' : ''}>
-                <span>${todo.text}</span>
+                <div class="todo-content">
+                    <div class="todo-text">${todo.text}</div>
+                    <div class="todo-meta">
+                        Priority: ${todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
+                    </div>
+                </div>
                 <button class="delete-todo">❌</button>
             </div>
         `;
@@ -96,6 +145,7 @@ class TodoApp {
 
     resetInputs() {
         this.todoInput.value = '';
+        this.prioritySelect.value = 'low';
         this.todoInput.focus();
     }
 }
