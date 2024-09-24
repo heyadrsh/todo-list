@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4a6cfa">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-check-circle"></i>
+                <h2>TaskFlow</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-view="all">
+                    <i class="fas fa-tasks"></i>
+                    <span>All Tasks</span>
+                </a>
+                <a href="#" class="nav-item" data-view="today">
+                    <i class="fas fa-calendar-day"></i>
+                    <span>Today</span>
+                </a>
+                <a href="#" class="nav-item" data-view="upcoming">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Upcoming</span>
+                </a>
+                <a href="#" class="nav-item" data-view="important">
+                    <i class="fas fa-star"></i>
+                    <span>Important</span>
+                </a>
+                <a href="#" class="nav-item" data-view="completed">
+                    <i class="fas fa-check-double"></i>
+                    <span>Completed</span>
+                </a>
+                <div class="nav-divider"></div>
+                <a href="#" class="nav-item" data-view="reminders">
+                    <i class="fas fa-bell"></i>
+                    <span>Reminders</span>
+                </a>
+                <a href="#" class="nav-item" data-view="pomodoro">
+                    <i class="fas fa-clock"></i>
+                    <span>Pomodoro</span>
+                </a>
+                <a href="#" class="nav-item" data-view="analytics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="#" class="nav-item" data-view="recurring">
+                    <i class="fas fa-redo"></i>
+                    <span>Recurring</span>
+                </a>
+                <a href="#" class="nav-item" data-view="shared">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Shared Tasks</span>
+                </a>
+            </nav>
+            <div class="theme-switcher">
+                <button id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                    <span>Dark Mode</span>
+                </button>
+            </div>
+            <div class="data-management">
+                <button id="export-data-btn">
+                    <i class="fas fa-download"></i>
+                    <span>Export Tasks</span>
+                </button>
+                <button id="import-data-btn">
+                    <i class="fas fa-upload"></i>
+                    <span>Import Tasks</span>
+                </button>
+                <input type="file" id="import-file-input" accept=".json" hidden>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Floating action button for quick add -->
+            <button id="fab-add-task" class="fab-button">
+                <i class="fas fa-plus"></i>
+            </button>
+
+            <header class="main-header">
+                <h1 id="current-view-title">All Tasks</h1>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span id="total-tasks">0</span>
+                        <span class="stat-label">Total</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="completed-tasks">0</span>
+                        <span class="stat-label">Completed</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="pending-tasks">0</span>
+                        <span class="stat-label">Pending</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="add-task-container">
+                <button id="quick-add-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>New Task</span>
+                </button>
+                <div class="task-input-container hidden">
+                    <div class="task-input-main">
+                        <input type="text" id="todo-input" placeholder="What needs to be done?">
+                        <button id="add-todo">Add Task</button>
+                    </div>
+                    <div class="task-input-details">
+                        <div class="input-group">
+                            <label><i class="fas fa-flag"></i> Priority</label>
+                            <select id="priority">
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label><i class="fas fa-calendar"></i> Due Date</label>
+                            <input type="date" id="due-date">
+                        </div>
+                        <div class="input-group">
+                            <label><i class="fas fa-list"></i> Category</label>
+                            <select id="category">
+                                <option value="none">None</option>
+                                <option value="personal">Personal</option>
+                                <option value="work">Work</option>
+                                <option value="health">Health</option>
+                                <option value="education">Education</option>
+                                <option value="finance">Finance</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label><i class="fas fa-star"></i> Important</label>
+                            <div class="toggle-container">
+                                <input type="checkbox" id="important" class="toggle-checkbox">
+                                <label for="important" class="toggle-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="task-input-extra">
+                        <div class="input-group">
+                            <label><i class="fas fa-bell"></i> Set Reminder</label>
+                            <div class="reminder-inputs">
+                                <input type="date" id="reminder-date">
+                                <input type="time" id="reminder-time">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label><i class="fas fa-repeat"></i> Repeat</label>
+                            <select id="repeat-option">
+                                <option value="never">Never</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekdays">Weekdays</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="biweekly">Bi-weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="quarterly">Quarterly</option>
+                                <option value="yearly">Yearly</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label><i class="fas fa-clock"></i> Estimated Time</label>
+                            <input type="number" id="estimated-time" placeholder="Minutes" min="1" max="240">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters-container">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Search tasks...">
+                    <button id="voice-search-btn" title="Search by voice">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+                <div class="dropdown-filters">
+                    <select id="filter-priority">
+                        <option value="all">All Priorities</option>
+                        <option value="high">High Priority</option>
+                        <option value="medium">Medium Priority</option>
+                        <option value="low">Low Priority</option>
+                    </select>
+                    <select id="filter-category">
+                        <option value="all">All Categories</option>
+                        <option value="personal">Personal</option>
+                        <option value="work">Work</option>
+                        <option value="health">Health</option>
+                        <option value="education">Education</option>
+                        <option value="finance">Finance</option>
+                    </select>
+                    <select id="filter-due">
+                        <option value="all">All Due Dates</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="today">Due Today</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="no-date">No Date</option>
+                    </select>
+                    <select id="filter-recurrence">
+                        <option value="all">All Tasks</option>
+                        <option value="recurring">Recurring Only</option>
+                        <option value="non-recurring">Non-recurring Only</option>
+                    </select>
+                </div>
+                <div class="sort-container">
+                    <select id="sort-by">
+                        <option value="created-desc">Newest First</option>
+                        <option value="created-asc">Oldest First</option>
+                        <option value="due-asc">Due Date (Earliest)</option>
+                        <option value="due-desc">Due Date (Latest)</option>
+                        <option value="priority-desc">Priority (High to Low)</option>
+                        <option value="priority-asc">Priority (Low to High)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Main Views -->
+            <div id="todos-container" class="todos-list"></div>
+
+            <!-- Empty state message -->
+            <div class="empty-state hidden">
+                <img src="icons/empty-state.svg" alt="No tasks">
+                <h3>No tasks found</h3>
+                <p>Add a new task to get started</p>
+                <button id="empty-state-add-btn">Add Task</button>
+            </div>
+
+            <!-- Pomodoro View -->
+            <div id="pomodoro-view" class="view-container hidden">
+                <div class="pomodoro-container">
+                    <div class="pomodoro-timer">
+                        <div class="timer-display">
+                            <span id="minutes">25</span>:<span id="seconds">00</span>
+                        </div>
+                        <div class="timer-mode">
+                            <span id="timer-mode-label">Focus Time</span>
+                        </div>
+                    </div>
+                    <div class="pomodoro-controls">
+                        <button id="pomodoro-start" class="pomodoro-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button id="pomodoro-pause" class="pomodoro-btn hidden">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                        <button id="pomodoro-reset" class="pomodoro-btn">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                    <div class="pomodoro-settings">
+                        <div class="pomo-setting">
+                            <label>Focus Time</label>
+                            <div class="pomo-time-control">
+                                <button class="pomo-time-btn" data-action="decrease" data-target="focus">-</button>
+                                <span id="focus-time">25</span> min
+                                <button class="pomo-time-btn" data-action="increase" data-target="focus">+</button>
+                            </div>
+                        </div>
+                        <div class="pomo-setting">
+                            <label>Break Time</label>
+                            <div class="pomo-time-control">
+                                <button class="pomo-time-btn" data-action="decrease" data-target="break">-</button>
+                                <span id="break-time">5</span> min
+                                <button class="pomo-time-btn" data-action="increase" data-target="break">+</button>
+                            </div>
+                        </div>
+                        <div class="pomo-task-selection">
+                            <label>Working on:</label>
+                            <select id="pomodoro-task-select">
+                                <option value="">Select a task</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="pomodoro-progress">
+                        <div class="pomo-progress-info">
+                            <span>Pomodoros completed today:</span>
+                            <span id="pomodoros-completed">0</span>
+                        </div>
+                        <div class="pomo-progress-info">
+                            <span>Total focus time today:</span>
+                            <span id="focus-time-today">0 min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics View -->
+            <div id="analytics-view" class="view-container hidden">
+                <div class="analytics-container">
+                    <div class="analytics-summary">
+                        <div class="analytics-card">
+                            <h3>Task Completion Rate</h3>
+                            <div class="completion-chart" id="completion-chart">
+                                <!-- Chart will be rendered here -->
+                            </div>
+                            <div class="completion-stats">
+                                <div class="stat">
+                                    <span class="stat-value" id="completion-rate">0%</span>
+                                    <span class="stat-label">Completion Rate</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-value" id="tasks-completed-week">0</span>
+                                    <span class="stat-label">Tasks Completed This Week</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>Category Distribution</h3>
+                            <div class="category-chart" id="category-chart">
+                                <!-- Chart will be rendered here -->
+                            </div>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>Productivity Insights</h3>
+                            <div class="productivity-insights">
+                                <div class="insight-item">
+                                    <i class="fas fa-clock"></i>
+                                    <div class="insight-content">
+                                        <h4>Most Productive Day</h4>
+                                        <p id="most-productive-day">Not enough data</p>
+                                    </div>
+                                </div>
+                                <div class="insight-item">
+                                    <i class="fas fa-award"></i>
+                                    <div class="insight-content">
+                                        <h4>Current Streak</h4>
+                                        <p id="current-streak">0 days</p>
+                                    </div>
+                                </div>
+                                <div class="insight-item">
+                                    <i class="fas fa-trophy"></i>
+                                    <div class="insight-content">
+                                        <h4>Best Streak</h4>
+                                        <p id="best-streak">0 days</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Details Modal -->
+    <div id="task-details-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Task Details</h2>
+                <button class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-task-form">
+                    <div class="form-group">
+                        <label for="edit-text">Task</label>
+                        <input type="text" id="edit-text" placeholder="Task description">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-priority">Priority</label>
+                            <select id="edit-priority">
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-due-date">Due Date</label>
+                            <input type="date" id="edit-due-date">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-category">Category</label>
+                            <select id="edit-category">
+                                <option value="none">None</option>
+                                <option value="personal">Personal</option>
+                                <option value="work">Work</option>
+                                <option value="health">Health</option>
+                                <option value="education">Education</option>
+                                <option value="finance">Finance</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-important">Important</label>
+                            <div class="toggle-container">
+                                <input type="checkbox" id="edit-important" class="toggle-checkbox">
+                                <label for="edit-important" class="toggle-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced options section -->
+                    <div class="advanced-options">
+                        <h3>Advanced Options</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Set Reminder</label>
+                                <div class="reminder-inputs">
+                                    <input type="date" id="edit-reminder-date">
+                                    <input type="time" id="edit-reminder-time">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="edit-repeat-option">Repeat</label>
+                                <select id="edit-repeat-option">
+                                    <option value="never">Never</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="weekdays">Weekdays</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="biweekly">Bi-weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-estimated-time">Estimated Time (minutes)</label>
+                                <input type="number" id="edit-estimated-time" min="1" max="240">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-notes">Notes</label>
+                        <textarea id="edit-notes" placeholder="Add notes here..."></textarea>
+                    </div>
+                    
+                    <!-- Subtasks section -->
+                    <div class="subtasks-section">
+                        <h3>Subtasks</h3>
+                        <div id="subtasks-container" class="subtasks-list">
+                            <!-- Subtasks will be rendered here -->
+                        </div>
+                        <div class="add-subtask">
+                            <input type="text" id="subtask-input" placeholder="Add a subtask">
+                            <button type="button" id="add-subtask-btn">Add</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Task info section -->
+                    <div class="task-info">
+                        <p>Created: <span id="created-date"></span></p>
+                        <p class="hidden">Completed: <span id="completed-date"></span></p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="delete-task-btn" class="btn-danger"><i class="fas fa-trash"></i> Delete</button>
+                <button id="save-task-btn" class="btn-primary"><i class="fas fa-save"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Task Modal -->
+    <div id="share-task-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Share Task</h2>
+                <button class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Share Link</label>
+                    <div class="share-link-container">
+                        <input type="text" id="share-link" readonly>
+                        <button id="copy-link-btn"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="share-options">
+                    <button id="share-email-btn" class="share-btn">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email</span>
+                    </button>
+                    <button id="share-whatsapp-btn" class="share-btn">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>WhatsApp</span>
+                    </button>
+                    <button id="share-telegram-btn" class="share-btn">
+                        <i class="fab fa-telegram"></i>
+                        <span>Telegram</span>
+                    </button>
+                </div>
+                <div class="qr-code-container">
+                    <div id="share-qr-code"></div>
+                    <p>Scan to open task</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <script src="app.js"></script>
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html> 
